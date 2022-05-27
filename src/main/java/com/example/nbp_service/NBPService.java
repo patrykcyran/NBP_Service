@@ -26,7 +26,7 @@ public class NBPService {
     private static final DecimalFormat df = new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
     public String getResponseString(URI uri) {
-        String responseBody = null;
+        String responseBody;
 
         HttpClient client = HttpClient.newBuilder().build();
 
