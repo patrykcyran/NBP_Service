@@ -1,31 +1,59 @@
 package com.example.nbp_service;
 
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+//Singleton class
 public class URICreator {
-    private static final String nbpUri = "http://api.nbp.pl/api";
 
-    public static URI createURI(int endpointCode, ArrayList<String> parameterList) {
+    private final String NBP_URI = "http://api.nbp.pl/api";
+    private Map<String, String> parametersMap = new HashMap<>();
+    private static URICreator instance;
+
+    private URICreator() {}
+
+    public static URICreator getInstance() {
+        if (instance == null) {
+            instance = new URICreator();
+        }
+        return instance;
+    }
+
+    public URI createURI(int endpointCode) {
         URI createdURI = null;
 
         switch (endpointCode) {
             case 1:
-                createdURI = URI.create(nbpUri + "/cenyzlota ");
+                createdURI = URI.create(NBP_URI + "/cenyzlota ");
                 break;
             case 2:
-                String days = parameterList.get(0);
-                createdURI = URI.create(nbpUri + "/cenyzlota/last/" + days);
+
+                String days = parametersMap.get("Days");
+                createdURI = URI.create(NBP_URI + "/cenyzlota/last/" + days);
                 break;
             case 3:
-                String currencyCode = parameterList.get(0);
-                days = parameterList.get(1);
-                createdURI = URI.create(nbpUri + "/exchangerate/rates/a/" + currencyCode + "/last/" + days);
+                String currencyCode = parametersMap.get("CurrencyCode");
+                days = parametersMap.get("Days");
+                createdURI = URI.create(NBP_URI + "/exchangerates/rates/a/" + currencyCode + "/last/" + days);
                 break;
             default:
                 break;
         }
+        clearParametersMap();
 
         return createdURI;
+    }
+
+    public void clearParametersMap() {
+        parametersMap.clear();
+    }
+
+    public void addDaysParameter(int days) {
+        parametersMap.put("Days", String.valueOf(days));
+    }
+
+    public void addCurrencyCodeParameter(String currencyCode) {
+        parametersMap.put("CurrencyCode", currencyCode);
     }
 }

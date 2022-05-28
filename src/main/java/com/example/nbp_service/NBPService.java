@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -14,16 +13,17 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.util.Locale;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 @Service
 public class NBPService {
-    private final String  nbpUri = "http://api.nbp.pl/api";
+    private final URICreator uriCreator;
     private static final DecimalFormat df = new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+
+    public NBPService() {
+        uriCreator = URICreator.getInstance();
+    }
 
     public String getResponseString(URI uri) {
         String responseBody;
@@ -50,7 +50,7 @@ public class NBPService {
         String responseBody;
         JsonArray responseArray;
 
-        URI uri = URI.create(nbpUri + "/cenyzlota");
+        URI uri = uriCreator.createURI(1);
 
         responseBody = getResponseString(uri);
         responseArray = JsonParser.parseString(responseBody).getAsJsonArray();
@@ -68,7 +68,9 @@ public class NBPService {
         String responseBody;
         JsonArray responseArray;
 
-        URI uri = URI.create(nbpUri + "/cenyzlota/last/" + days);
+        uriCreator.addDaysParameter(days);
+
+        URI uri = uriCreator.createURI(2);
 
         responseBody = getResponseString(uri);
         responseArray = JsonParser.parseString(responseBody).getAsJsonArray();
@@ -90,9 +92,10 @@ public class NBPService {
         JsonArray responseArray;
         JsonObject jsonObject;
 
-        URI uri = URI.create(nbpUri + "/exchangerates/rates/a/" + currencyCode + "/last/" + days);
+        uriCreator.addCurrencyCodeParameter(currencyCode);
+        uriCreator.addDaysParameter(days);
 
-        System.out.println(uri);
+        URI uri = uriCreator.createURI(3);
 
         responseBody = getResponseString(uri);
         jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
